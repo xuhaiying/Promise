@@ -148,6 +148,33 @@ Promise.reject = function (reason){
         reject(reason);
     })
 }
+Promise.all = function (promises){
+    let arr = [];
+    let currentIndex = 0; // 如果promises数组最后面的函数先返回了，用arr.length 和promise.length做比较不正确
+    function processData(index,val){
+        arr[index] = val;
+        currentIndex++;// 记录一下成功的次数
+        // 如果到达了执行目标就让all的promise成功
+        if (currentIndex === promises.length){
+            resolve(arr);
+        }
+    }
+    return new Promise(function (resolve,reject){
+        for(let i=0;i<promises.length;i++){
+            promises[i].then(function (data){
+                processData(i,data);
+            },reject); // 如果promises有一项失败就全部失败
+        }
+    })
+}
+// 先得到返回结果的函数成功则成功，失败则失败
+Promise.race = function (promises){
+    return new Promise(function (resolve,reject){
+        for(let i=0;i<promise.length;i++){
+            promises[i].then(resolve,reject);
+        }
+    })
+}
 // ES9的草案，原生的Promise也还不支持
 Promise.prototype.finnally = function (cb){
     // finnally中传递的回调函数必须会执行
